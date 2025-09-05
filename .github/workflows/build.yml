@@ -26,14 +26,12 @@ jobs:
           sudo apt update
           sudo apt install -y python3 python3-pip unzip wget git build-essential clang curl
 
-      # 3. 安装 Rust
       - name: Install Rust
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rust-lang.org | sh -s -- -y
-          echo "source $HOME/.cargo/env" >> $GITHUB_ENV
-          source $HOME/.cargo/env
-          rustc --version
-          cargo --version
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
 
       # 4. 下载 Magisk NDK
       - name: Setup Magisk NDK
