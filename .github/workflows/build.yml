@@ -13,31 +13,40 @@ jobs:
         shell: bash
 
     steps:
+      # 1. 拉取 Magisk 源码并初始化 submodule
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
 
+      # 2. 安装依赖
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3 python3-pip unzip wget git curl build-essential clang
+          sudo apt install -y python3 python3-pip unzip wget git build-essential clang curl
 
+      # 3. 安装 Rust
       - name: Install Rust
         run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rust-lang.org | sh -s -- -y
+          echo "source $HOME/.cargo/env" >> $GITHUB_ENV
           source $HOME/.cargo/env
           rustc --version
           cargo --version
 
+      # 4. 下载 Magisk NDK
       - name: Setup Magisk NDK
-        run: |
-          python3 build.py ndk
+        run: python3 build.py ndk
 
-      - name: Build native binaries (magiskboot etc.)
+      # 5. 编译 native 二进制（magiskboot 等）
+      - name: Build native binaries
         run: |
           source $HOME/.cargo/env
           python3 build.py native
 
-      - name: Upload artifact
+      # 6. 上传 magiskboot 作为 artifact
+      - name: Upload magiskboot
         uses: actions/upload-artifact@v4
         with:
           name: magiskboot
